@@ -7,7 +7,7 @@
 # To enable mkblctrl_+ startup add a /fs/microsd/APM/mkblctrl_+ file
 # To enable mkblctrl_x startup add a /fs/microsd/APM/mkblctrl_x file
 # To enable PWM on FMUv1 on ttyS1 add a /fs/microsd/APM/AUXPWM.en file
-
+echo "myecho1"
 set deviceA /dev/ttyACM0
 
 # check for an old file called APM, caused by 
@@ -503,7 +503,7 @@ then
 else
     sh /etc/init.d/rc.error
 fi
-
+echo "myecho2"
 echo "rc.APM finished"
 
 echo "here1"
