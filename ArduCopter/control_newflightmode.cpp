@@ -22,10 +22,10 @@ static bool newflightmode_init(bool ignore_checks)
 static void newflightmode_run()
 {
     // if not armed or throttle at zero, set throttle to zero and exit immediately
-    if(!motors.armed() || g.rc_3.control_in <= 0) {
-        attitude_control.relax_bf_rate_controller();
-        attitude_control.set_yaw_target_to_current_heading();
-        attitude_control.set_throttle_out(0, false);
+// if(!motors.armed() || g.rc_3.control_in <= 0) {
+// attitude_control.relax_bf_rate_controller();
+// attitude_control.set_yaw_target_to_current_heading();
+// attitude_control.set_throttle_out(0, false);
         return;
     }
 
