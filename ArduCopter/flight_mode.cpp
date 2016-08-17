@@ -82,6 +82,10 @@ bool Copter::set_mode(control_mode_t mode, mode_reason_t reason)
         case FLIP:
             success = flip_init(ignore_checks);
             break;
+            
+        case NEWFLIGHTMODE:
+            success = newflightmode_init(ignore_checks);
+            break;
 
 #if AUTOTUNE_ENABLED == ENABLED
         case AUTOTUNE:
@@ -208,6 +212,10 @@ void Copter::update_flight_mode()
 
         case FLIP:
             flip_run();
+            break;
+            
+        case NEWFLIGHTMODE:
+            success = newflightmode_run();
             break;
 
 #if AUTOTUNE_ENABLED == ENABLED
@@ -394,6 +402,9 @@ void Copter::print_flight_mode(AP_HAL::BetterStream *port, uint8_t mode)
         break;
     case FLIP:
         port->print("FLIP");
+        break;
+    case NEWFLIGHTMODE:
+        port->print_P(PSTR("NEWFLIGHTMODE"));
         break;
     case AUTOTUNE:
         port->print("AUTOTUNE");
