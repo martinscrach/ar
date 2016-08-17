@@ -401,6 +401,10 @@ private:
 
     // Flip
     Vector3f flip_orig_attitude;         // original copter attitude before flip
+    
+    //New Flight Mode
+    bool newflightmode_init(bool ignore_checks);
+    void newflightmode_run();
 
     // Throw
     bool throw_early_exit_interlock = true; // value of the throttle interlock that must be restored when exiting throw mode early
