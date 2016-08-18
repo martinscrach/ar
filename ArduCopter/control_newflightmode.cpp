@@ -3,41 +3,57 @@
 #include "Copter.h"
 
 /*
- * control_newflightmode.cpp - init and run calls for new flight mode
+ * Init and run calls for new flight mode
  */
 
-// newflightmode_init - initialise flight mode
-static bool newflightmode_init(bool ignore_checks)
+// newflightmode_init - initialise newflightmode controller
+bool Copter::newflightmode_init(bool ignore_checks)
 {
-    // do any required initialisation of the flight mode here
-    // this code will be called whenever the operator switches into this mode
+    // if landed and the mode we're switching from does not have manual throttle and the throttle stick is too high
+    if (motors.armed() && ap.land_complete && !mode_has_manual_throttle(control_mode) && (get_pilot_desired_throttle(channel_throttle->get_control_in()) > get_non_takeoff_throttle())) {
+        return false;
+    }
+    // set target altitude to zero for reporting
+    pos_control.set_alt_target(0);
 
-    // return true initialisation is successful, false if it fails
-    // if false is returned here the vehicle will remain in the previous flight mode
     return true;
 }
 
-// newflightmode_run - runs the main controller
-// will be called at 100hz or more
-static void newflightmode_run()
+// newflightmode_run - runs the main newflightmode controller
+// should be called at 100hz or more
+void Copter::newflightmode_run()
 {
-    // if not armed or throttle at zero, set throttle to zero and exit immediately
-// if(!motors.armed() || g.rc_3.control_in <= 0) {
-// attitude_control.relax_bf_rate_controller();
-// attitude_control.set_yaw_target_to_current_heading();
-// attitude_control.set_throttle_out(0, false);
+    float target_roll, target_pitch;
+    float target_yaw_rate;
+    float pilot_throttle_scaled;
+
+    // if not armed set throttle to zero and exit immediately
+    if (!motors.armed() || ap.throttle_zero || !motors.get_interlock()) {
+        motors.set_desired_spool_state(AP_Motors::DESIRED_SPIN_WHEN_ARMED);
+        attitude_control.set_throttle_out_unstabilized(0,true,g.throttle_filt);
         return;
     }
 
-    // convert pilot input into desired vehicle angles or rotation rates
-    //   g.rc_1.control_in : pilots roll input in the range -4500 ~ 4500
-    //   g.rc_2.control_in : pilot pitch input in the range -4500 ~ 4500
-    //   g.rc_3.control_in : pilot's throttle input in the range 0 ~ 1000
-    //   g.rc_4.control_in : pilot's yaw input in the range -4500 ~ 4500
+    motors.set_desired_spool_state(AP_Motors::DESIRED_THROTTLE_UNLIMITED);
 
-    // call one of attitude controller's attitude control functions like
-    //   attitude_control.angle_ef_roll_pitch_rate_yaw(roll angle, pitch angle, yaw rate);
+    // apply SIMPLE mode transform to pilot inputs
+    update_simple_mode();
 
-    // call position controller's z-axis controller or simply pass through throttle
-    //   attitude_control.set_throttle_out(desired throttle, true);
+    // convert pilot input to lean angles
+    // To-Do: convert get_pilot_desired_lean_angles to return angles as floats
+    get_pilot_desired_lean_angles(channel_roll->get_control_in(), channel_pitch->get_control_in(), target_roll, target_pitch, aparm.angle_max);
+
+    // get pilot's desired yaw rate
+    target_yaw_rate = get_pilot_desired_yaw_rate(channel_yaw->get_control_in());
+
+    // get pilot's desired throttle
+    pilot_throttle_scaled = get_pilot_desired_throttle(channel_throttle->get_control_in());
+
+    // call attitude controller
+    attitude_control.input_euler_angle_roll_pitch_euler_rate_yaw(target_roll, target_pitch, target_yaw_rate, get_smoothing_gain());
+
+    // body-frame rate controller is run directly from 100hz loop
+
+    // output pilot's throttle
+    attitude_control.set_throttle_out(pilot_throttle_scaled, true, g.throttle_filt);
 }
