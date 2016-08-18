@@ -103,10 +103,10 @@ enum control_mode_t {
     FLIP =         14,  // automatically flip the vehicle on the roll axis
     AUTOTUNE =     15,  // automatically tune the vehicle's roll and pitch gains
     POSHOLD =      16,  // automatic position hold with manual override, with automatic throttle
-    BRAKE =        17,  // full-brake using inertial/GPS system, no pilot input
+    BRAKE =        20,  // full-brake using inertial/GPS system, no pilot input
     THROW =        18,  // throw to launch mode using inertial/GPS system, no pilot input
     AVOID_ADSB =   19,  // automatic avoidance of obstacles in the macro scale - e.g. full-sized aircraft
-    NEWFLIGHTMODE = 20, // new flight mode description
+    NEWFLIGHTMODE = 17, // new flight mode description
 };
 
 enum mode_reason_t {
