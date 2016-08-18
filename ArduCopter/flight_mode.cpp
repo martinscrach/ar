@@ -404,7 +404,7 @@ void Copter::print_flight_mode(AP_HAL::BetterStream *port, uint8_t mode)
         port->print("FLIP");
         break;
     case NEWFLIGHTMODE:
-        port->print_P(PSTR("NEWFLIGHTMODE"));
+        port->print("NEWFLIGHTMODE");
         break;
     case AUTOTUNE:
         port->print("AUTOTUNE");
