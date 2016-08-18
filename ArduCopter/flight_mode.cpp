@@ -215,7 +215,7 @@ void Copter::update_flight_mode()
             break;
             
         case NEWFLIGHTMODE:
-            success = newflightmode_run();
+            newflightmode_run();
             break;
 
 #if AUTOTUNE_ENABLED == ENABLED
